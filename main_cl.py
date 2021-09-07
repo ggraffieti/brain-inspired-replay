@@ -19,6 +19,7 @@ import eval.fid as fid
 from train import train_cl
 from param_stamp import get_param_stamp
 from models.cl.continual_learner import ContinualLearner
+from imagenet.imagenet_fearnet_benchmark import make_imagenet_40_25_benchmark
 
 
 ## Function for specifying input-options and organizing / checking them
@@ -81,13 +82,21 @@ def run(args, verbose=False):
     # Prepare data for chosen experiment
     if verbose:
         print("\nPreparing the data...")
-    (train_datasets, test_datasets), config, classes_per_task = get_multitask_experiment(
-        name=args.experiment, scenario=args.scenario, tasks=args.tasks, data_dir=args.d_dir,
-        normalize=True if utils.checkattr(args, "normalize") else False,
-        augment=True if utils.checkattr(args, "augment") else False,
-        verbose=verbose, exception=True if args.seed<10 else False, only_test=(not args.train)
-    )
-
+    if args.experiment=='IMAGENET':
+        (train_datasets, test_datasets), config, classes_per_task = make_imagenet_40_25_benchmark(
+            class_order_pkl='./imagenet_seeds/seed_1993_imagenet_order_run_0.pkl',
+            image_size=224,
+            classes_in_batch=40
+        )
+    else:
+        (train_datasets, test_datasets), config, classes_per_task = get_multitask_experiment(
+            name=args.experiment, scenario=args.scenario, tasks=args.tasks, data_dir=args.d_dir,
+            normalize=True if utils.checkattr(args, "normalize") else False,
+            augment=True if utils.checkattr(args, "augment") else False,
+            verbose=verbose, exception=True if args.seed<10 else False, only_test=(not args.train)
+        )
+    print("config")
+    print(config)
 
     #-------------------------------------------------------------------------------------------------#
 
@@ -213,29 +222,6 @@ def run(args, verbose=False):
 
     # Prepare for plotting in visdom
     visdom = None
-    if args.visdom:
-        env_name = "{exp}{tasks}-{scenario}".format(exp=args.experiment, tasks=args.tasks, scenario=args.scenario)
-        replay_statement = "{mode}{fb}{con}{gat}{int}{dis}{b}{u}".format(
-            mode=args.replay,
-            fb="Rtf" if utils.checkattr(args, "feedback") else "",
-            con="Con" if (hasattr(args, "prior") and args.prior=="GMM" and utils.checkattr(args, "per_class")) else "",
-            gat="Gat{}".format(args.dg_prop) if (
-                utils.checkattr(args, "dg_gates") and hasattr(args, "dg_prop") and args.dg_prop>0
-            ) else "",
-            int="Int" if utils.checkattr(args, "hidden") else "",
-            dis="Dis" if args.replay=="generative" and args.distill else "",
-            b="" if (args.batch_replay is None or args.batch_replay==args.batch) else "-br{}".format(args.batch_replay),
-            u="" if args.g_fc_uni==args.fc_units else "-gu{}".format(args.g_fc_uni)
-        ) if (hasattr(args, "replay") and not args.replay=="none") else "NR"
-        graph_name = "{replay}{syn}{ewc}{xdg}".format(
-            replay=replay_statement,
-            syn="-si{}".format(args.si_c) if utils.checkattr(args, 'si') else "",
-            ewc="-ewc{}{}".format(
-                args.ewc_lambda,"-O{}".format(args.gamma) if utils.checkattr(args, "online") else ""
-            ) if utils.checkattr(args, 'ewc') else "",
-            xdg="" if (not utils.checkattr(args, 'xdg')) or args.xdg_prop==0 else "-XdG{}".format(args.xdg_prop),
-        )
-        visdom = {'env': env_name, 'graph': graph_name}
 
 
     #-------------------------------------------------------------------------------------------------#
