@@ -1,4 +1,4 @@
-import visual.visdom
+# import visual.visdom
 from . import evaluate
 from torch.utils.data import ConcatDataset
 import utils

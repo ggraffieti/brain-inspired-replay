@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn import manifold
 import torch
-import visual.visdom
+# import visual.visdom
 import visual.plt
 import utils
 
