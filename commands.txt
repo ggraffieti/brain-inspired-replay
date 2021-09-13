@@ -1,0 +1,14 @@
+# command
+python main_cl.py --experiment=splitMNIST --scenario=class --tasks=5 --replay=generative --brain-inspired --batch=128
+
+
+# read results
+
+with (open("dict-splitMNIST5-class--VAE=F-784x400x400_z100-GMM10pc_c10_cg0.8--i2000-lr0.001-b128--gen-Di2.0--BCE.pkl", "rb")) as openfile: 
+    while True:
+        try:
+            objects.append(pickle.load(openfile))
+        except EOFError:
+            break
+
+
