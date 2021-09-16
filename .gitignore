@@ -2,7 +2,7 @@ store/datasets/
 store/plots/
 store/models/mM*
 store/models/gM*
-
+imagenet_seeds/
 .env
 __pycache__/
 .idea/
