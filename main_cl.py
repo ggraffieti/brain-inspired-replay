@@ -85,7 +85,7 @@ def run(args, verbose=False):
     if args.experiment=='IMAGENET':
         (train_datasets, test_datasets), config, classes_per_task = make_imagenet_40_25_benchmark(
             class_order_pkl='./imagenet_seeds/seed_1993_imagenet_order_run_0.pkl',
-            image_size=224,
+            image_size=32,
             classes_in_batch=40
         )
     else:

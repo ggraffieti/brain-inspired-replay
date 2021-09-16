@@ -99,7 +99,7 @@ def train_cl(model, train_datasets, replay_mode="none", scenario="task", rnt=Non
 
     # Loop over all tasks.
     for task, train_dataset in enumerate(train_datasets, 1):
-
+        print("start training on task {}".format(task))
         # If offline replay-setting, create large database of all tasks so far
         if replay_mode=="offline" and (not scenario=="task"):
             train_dataset = ConcatDataset(train_datasets[:task])
